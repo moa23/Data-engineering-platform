@@ -1,22 +1,3 @@
-# Data Engineering Platform
-
-A Python-based data engineering pipeline that ingests historical stock market data, validates and transforms it through Bronze, Silver, and Gold layers, and generates a data quality report.
-
-## Architecture
-
-```mermaid
-flowchart TD
-    A["Yahoo Finance API"] --> B["Bronze: Raw CSV"]
-    B --> C["Silver: Clean and validate"]
-    C --> D["Gold: DuckDB analytics"]
-    C --> E["Data quality report"]
-    D --> F["Analytics CSV"]
-    E --> G["Quality report CSV"]
-
-    H["GitHub Actions"] --> I["Run pytest"]
-    I --> J["Automated test results"]
-```
-
 ## Features
 
 - Ingests historical stock market data using Python and `yfinance`.
@@ -28,19 +9,17 @@ flowchart TD
   - Daily percentage returns
   - 20-day moving averages
   - 20-day rolling volatility
+- Includes SQL analytics to identify the 10 best and 10 worst trading days by daily percentage return.
 - Generates a CSV data quality report.
 - Includes automated tests with pytest.
 - Uses structured logging to help monitor pipeline execution.
 - Runs automated tests through GitHub Actions on pushes and pull requests to `main`.
 
-## Technology Stack
+## SQL Analytics
 
-- Python
-- pandas
-- DuckDB and SQL
-- yfinance
-- pytest
-- Git and GitHub Actions
+The SQL queries are available in `sql/analytics.sql` and run against the Gold dataset, `data/gold/stock_analytics.csv`.
+
+The queries identify the 10 highest and 10 lowest daily percentage returns, demonstrating filtering, sorting, and analytical querying with DuckDB SQL.
 
 ## Project Structure
 
@@ -58,6 +37,8 @@ data-engineering-platform/
 │   │   ├── gold.py
 │   │   └── quality_report.py
 │   └── pipeline.py
+├── sql/
+│   └── analytics.sql
 ├── tests/
 │   └── test_pipeline.py
 ├── .github/
@@ -66,54 +47,3 @@ data-engineering-platform/
 ├── requirements.txt
 └── README.md
 ```
-
-## Getting Started
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/moa23/Data-engineering-platform.git
-cd Data-engineering-platform
-```
-
-### 2. Create a virtual environment
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```bash
-python -m pip install -r requirements.txt
-```
-
-### 4. Run the pipeline
-
-```bash
-python -m src.pipeline
-```
-
-The pipeline downloads data, creates the Silver and Gold datasets, and generates a quality report.
-
-### 5. Run the tests
-
-```bash
-python -m pytest -v
-```
-
-## Data Quality
-
-The quality report checks:
-
-- Total number of rows
-- Missing required values
-- Duplicate ticker/date records
-- Invalid price and volume records
-
-The report is saved to `data/gold/data_quality_report.csv`.
-
-## Current Scope
-
-This project currently uses CSV files for storage and runs locally. It is designed as a foundation for further development in orchestration, cloud storage, and scalable data processing.
