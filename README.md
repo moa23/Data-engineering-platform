@@ -4,20 +4,17 @@ A Python-based data engineering pipeline that ingests historical stock market da
 
 ## Architecture
 
-```text
-Yahoo Finance
-     |
-     v
-Bronze: Raw CSV data
-     |
-     v
-Silver: Validated and cleaned data
-     |
-     v
-Gold: SQL analytics using DuckDB
-     |
-     v
-Data Quality Report
+```mermaid
+flowchart TD
+    A["Yahoo Finance API"] --> B["Bronze: Raw CSV"]
+    B --> C["Silver: Clean and validate"]
+    C --> D["Gold: DuckDB analytics"]
+    C --> E["Data quality report"]
+    D --> F["Analytics CSV"]
+    E --> G["Quality report CSV"]
+
+    H["GitHub Actions"] --> I["Run pytest"]
+    I --> J["Automated test results"]
 ```
 
 ## Features
@@ -34,6 +31,7 @@ Data Quality Report
 - Generates a CSV data quality report.
 - Includes automated tests with pytest.
 - Uses structured logging to help monitor pipeline execution.
+- Runs automated tests through GitHub Actions on pushes and pull requests to `main`.
 
 ## Technology Stack
 
@@ -42,7 +40,7 @@ Data Quality Report
 - DuckDB and SQL
 - yfinance
 - pytest
-- Git and GitHub
+- Git and GitHub Actions
 
 ## Project Structure
 
@@ -62,6 +60,9 @@ data-engineering-platform/
 │   └── pipeline.py
 ├── tests/
 │   └── test_pipeline.py
+├── .github/
+│   └── workflows/
+│       └── tests.yml
 ├── requirements.txt
 └── README.md
 ```
@@ -72,7 +73,7 @@ data-engineering-platform/
 
 ```bash
 git clone https://github.com/moa23/Data-engineering-platform.git
-cd data-engineering-platform
+cd Data-engineering-platform
 ```
 
 ### 2. Create a virtual environment
@@ -111,9 +112,7 @@ The quality report checks:
 - Duplicate ticker/date records
 - Invalid price and volume records
 
-The report is saved to:
-
-`data/gold/data_quality_report.csv`
+The report is saved to `data/gold/data_quality_report.csv`.
 
 ## Current Scope
 
