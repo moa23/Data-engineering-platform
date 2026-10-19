@@ -26,3 +26,13 @@ jobs:
 
       - name: Run data pipeline
         run: python -m src.pipeline
+
+      - name: Upload pipeline results
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-pipeline-results
+          path: |
+            data/gold/stock_analytics.csv
+            data/gold/data_quality_report.csv
+          if-no-files-found: error
+          retention-days: 14
