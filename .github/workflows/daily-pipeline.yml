@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: "0 6 * * 1-5"
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
@@ -27,7 +31,26 @@ jobs:
       - name: Run data pipeline
         run: python -m src.pipeline
 
-      - name: Upload pipeline results
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Upload results to Cloud Storage
+        env:
+          GCS_BUCKET_NAME: data-engineering-platform-313288084160
+        run: |
+          RUN_DATE=$(date -u +%Y%m%d-%H%M%S)
+          gcloud storage cp data/gold/stock_analytics.csv \
+            "gs://${GCS_BUCKET_NAME}/gold/daily/stock_analytics_${RUN_DATE}.csv"
+          gcloud storage cp data/gold/data_quality_report.csv \
+            "gs://${GCS_BUCKET_NAME}/gold/daily/data_quality_report_${RUN_DATE}.csv"
+
+      - name: Upload pipeline results as GitHub artifact
         uses: actions/upload-artifact@v4
         with:
           name: data-pipeline-results
